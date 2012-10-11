@@ -14,13 +14,11 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using MongoDB.Bson.IO;
 using NUnit.Framework;
 
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Options;
 
 namespace MongoDB.BsonUnitTests
@@ -32,6 +30,12 @@ namespace MongoDB.BsonUnitTests
         {
             public int N;
             public ObjectId Id; // deliberately not the first element
+        }
+
+        private class D
+        {
+            public ObjectId Id;
+            public DateTime Date;
         }
 
         [Test]
@@ -121,6 +125,22 @@ namespace MongoDB.BsonUnitTests
             var c = new C { N = 1, Id = ObjectId.Empty };
             var json = c.ToJson(DocumentSerializationOptions.SerializeIdFirstInstance);
             var expected = "{ '_id' : ObjectId('000000000000000000000000'), 'N' : 1 }".Replace("'", "\"");
+            Assert.AreEqual(expected, json);
+        }
+
+        [Test]
+        public void TestToJsonIso8601Datetime()
+        {
+            var utc = DateTime.UtcNow;
+            var utcIso8601 = utc.ToString("s", System.Globalization.CultureInfo.InvariantCulture);
+            var doc = new D { Id = ObjectId.Empty, Date = utc };
+            var bson = doc.ToBsonDocument(DocumentSerializationOptions.SerializeIdFirstInstance);
+
+            var jsonWriterSettings = JsonWriterSettings.Defaults;
+            jsonWriterSettings.UseIso8601DateFormat = true;
+            var json = bson.ToJson(jsonWriterSettings);
+
+            var expected = ("{ '_id' : ObjectId('000000000000000000000000'), 'Date' : " + utcIso8601 + " }").Replace("'", "\"");
             Assert.AreEqual(expected, json);
         }
     }

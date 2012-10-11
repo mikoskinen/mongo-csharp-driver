@@ -37,6 +37,7 @@ namespace MongoDB.Bson.IO
         private string _newLineChars = "\r\n";
         private JsonOutputMode _outputMode = JsonOutputMode.Shell;
         private Version _shellVersion = new Version(2, 0, 0);
+        private bool _useISO8601DateFormat = false;
 
         // constructors
         /// <summary>
@@ -57,6 +58,7 @@ namespace MongoDB.Bson.IO
         /// <param name="newLineChars">The new line characters.</param>
         /// <param name="outputMode">The output mode.</param>
         /// <param name="shellVersion">The version of the shell to target.</param>
+        /// <param name="useISO8601DateFormat">Use the ISO-8601 date format </param>
         public JsonWriterSettings(
             bool closeOutput,
             Encoding encoding,
@@ -65,7 +67,8 @@ namespace MongoDB.Bson.IO
             string indentChars,
             string newLineChars,
             JsonOutputMode outputMode,
-            Version shellVersion)
+            Version shellVersion,
+            bool useISO8601DateFormat)
             : base(guidRepresentation)
         {
             _closeOutput = closeOutput;
@@ -75,6 +78,7 @@ namespace MongoDB.Bson.IO
             _newLineChars = newLineChars;
             _outputMode = outputMode;
             _shellVersion = shellVersion;
+            _useISO8601DateFormat = useISO8601DateFormat;
         }
 
         // public static properties
@@ -186,6 +190,19 @@ namespace MongoDB.Bson.IO
             }
         }
 
+        /// <summary>
+        /// Gets or sets if the datest should be parsed in ISO-8601 format
+        /// </summary>
+        public bool UseIso8601DateFormat
+        {
+            get { return _useISO8601DateFormat; }
+            set
+            {
+                if (IsFrozen) { throw new InvalidOperationException("JsonWriterSettings is frozen."); }
+                _useISO8601DateFormat = value;
+            }
+        }
+
         // public methods
         /// <summary>
         /// Creates a clone of the settings.
@@ -203,7 +220,7 @@ namespace MongoDB.Bson.IO
         /// <returns>A clone of the settings.</returns>
         protected override BsonWriterSettings CloneImplementation()
         {
-            return new JsonWriterSettings(_closeOutput, _encoding, GuidRepresentation, _indent, _indentChars, _newLineChars, _outputMode, _shellVersion);
+            return new JsonWriterSettings(_closeOutput, _encoding, GuidRepresentation, _indent, _indentChars, _newLineChars, _outputMode, _shellVersion, _useISO8601DateFormat);
         }
     }
 }
