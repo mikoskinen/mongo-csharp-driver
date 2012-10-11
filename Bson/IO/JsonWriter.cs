@@ -217,12 +217,11 @@ namespace MongoDB.Bson.IO
                             value <= BsonConstants.DateTimeMaxValueMillisecondsSinceEpoch)
                         {
                             var utcDateTime = BsonUtils.ToDateTimeFromMillisecondsSinceEpoch(value);
-                            var dateString = _jsonWriterSettings.UseIso8601DateFormat
-                                                 ? utcDateTime.ToString("s", CultureInfo.InvariantCulture)
-                                                 : string.Format("ISODate(\"{0}\")",
-                                                                 utcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.FFFZ"));
 
-                            _textWriter.Write(dateString, CultureInfo.InvariantCulture);
+                            if (!_jsonWriterSettings.UseIso8601DateFormat)
+                                _textWriter.Write("ISODate(\"{0}\")", utcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.FFFZ"));
+                            else
+                                _textWriter.Write("\"{0}\"", utcDateTime.ToString("s", CultureInfo.InvariantCulture));
                         }
                         else
                         {

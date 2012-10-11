@@ -140,7 +140,7 @@ namespace MongoDB.BsonUnitTests
             jsonWriterSettings.UseIso8601DateFormat = true;
             var json = bson.ToJson(jsonWriterSettings);
 
-            var expected = ("{ '_id' : ObjectId('000000000000000000000000'), 'Date' : " + utcIso8601 + " }").Replace("'", "\"");
+            var expected = ("{ '_id' : ObjectId('000000000000000000000000'), 'Date' : \"" + utcIso8601 + "\" }").Replace("'", "\"");
             Assert.AreEqual(expected, json);
         }
     }
